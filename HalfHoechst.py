@@ -5,16 +5,18 @@ from glob import glob
 import statistics
 from scipy import integrate
 
-files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/**/*.csv', recursive=True)
+#files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
+files = glob('/groups/gerlich/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
 files
 
-
-def seperation_bulkDNA_local(dataframe):
+def seperation_bulkDNA_local(dataframe,baseline):
     df = dataframe
 
+    i=0
     if 'Scc1' in df.columns:
         standart = pd.DataFrame()
         standart['Distance'] = df['Distance']
+        # z-standardize
         standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
         standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
         standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
@@ -22,9 +24,9 @@ def seperation_bulkDNA_local(dataframe):
         # defiing chromosomal region according to hoechst threshhold
         standart['Chromosome'] = "no"
         # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
-        standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
+        standart.loc[standart['Hoechst'] > baseline, ['Chromosome']] = 'yes'
 
-        # splotting values over threshhold into condecutive dictionaries
+        # splotting values over threshhold into consecutive dictionaries
         s = (standart['Chromosome'] == 'yes')
         s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
         grp = {}
@@ -40,7 +42,7 @@ def seperation_bulkDNA_local(dataframe):
         # defiing chromosomal region according to hoechst threshhold
         standart['Chromosome'] = "no"
         # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
-        standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
+        standart.loc[standart['Hoechst'] > baseline, ['Chromosome']] = 'yes'
 
         # splotting values over threshhold into condecutive dictionaries
         s = (standart['Chromosome'] == 'yes')
@@ -53,11 +55,11 @@ def seperation_bulkDNA_local(dataframe):
     dicts = list(range(1, i+1))
     dicts
     names = {}
-    for i in dicts:
-        names["Block{0}".format(i)] = [i, len(grp[i])]
+    for block in dicts:
+        names["Block{0}".format(block)] = [block, len(grp[block])]
     currentDF = pd.DataFrame.from_dict(names, orient='index', columns=['grp_number', 'Length'])
     currentDF.head()
-    Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number']
+    Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number'] 
     x = int(Chromosome_block)
     chromosome = grp[x]
 
@@ -94,21 +96,34 @@ def seperation_bulkDNA_local(dataframe):
     results = [left_EdU, right_EdU, ratio_EdU, percentage_EdU, left_Hoechst, right_Hoechst, ratio_Hoechst, percentage_Hoechst]
     return results
 
-def meanpercentage():
+
+def meanpercentage(files,baseline):
     ratios_dict = {}
     index = 0
     for file in files:
         try:
-            ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file))
+            ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file),baseline)
             index += 1
         except KeyError:
-            print(f'{file}was skipped')
+            print(f'{file}was skipped for {baseline}')
     ratios_df = pd.DataFrame.from_dict(ratios_dict, orient='index', columns=['File', 'left_EdU', 'right_EdU', 'ratio_EdU', 'percentage_EdU', 'left_Hoechst', 'right_Hoechst', 'ratio_Hoechst', 'percentage_Hoechst'])
     percentage_means = [ratios_df['percentage_EdU'].mean(), ratios_df['percentage_Hoechst'].mean()]
-    return 
+    return percentage_means
 
-# plt.hist(ratios_df['ratio_Hoechst'], color='b')
-# plt.hist(ratios_df['ratio_EdU'], color='r')
 
-# plt.hist(ratios_df['percentage_Hoechst'], color='b', alpha=0.6)
-# plt.hist(ratios_df['percentage_EdU'], color='r', alpha=0.6)
+baselines = list(np.arange(-1.5, -0.45, 0.05))
+print(baselines)
+percentage_means_dict = {}
+
+index = 0
+for baseline in baselines:
+    percentage_means_dict[index] = [baseline] + meanpercentage(files, baseline)
+    index += 1
+
+percentage_means_df = pd.DataFrame.from_dict(percentage_means_dict, orient='index', columns=['Baseline', 'percentage_EdU', 'percentage_Hoechst'])
+percentage_means_df.head
+
+
+plt.plot(percentage_means_df['Baseline'], percentage_means_df['percentage_EdU'], color='r', label='EdU on one sister')
+plt.plot(percentage_means_df['Baseline'], percentage_means_df['percentage_Hoechst'], color='b', label='Hoechst on one sister')
+plt.legend()
