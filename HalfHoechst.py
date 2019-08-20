@@ -5,9 +5,11 @@ from glob import glob
 import statistics
 from scipy import integrate
 
-#files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
-files = glob('/groups/gerlich/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
+files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
+# files = glob('/groups/gerlich/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
+
 files
+
 
 def seperation_bulkDNA_local(dataframe,baseline):
     df = dataframe
@@ -16,7 +18,6 @@ def seperation_bulkDNA_local(dataframe,baseline):
     if 'Scc1' in df.columns:
         standart = pd.DataFrame()
         standart['Distance'] = df['Distance']
-        # z-standardize
         standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
         standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
         standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
@@ -26,7 +27,7 @@ def seperation_bulkDNA_local(dataframe,baseline):
         # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
         standart.loc[standart['Hoechst'] > baseline, ['Chromosome']] = 'yes'
 
-        # splotting values over threshhold into consecutive dictionaries
+        # splotting values over threshhold into condecutive dictionaries
         s = (standart['Chromosome'] == 'yes')
         s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
         grp = {}
@@ -59,7 +60,8 @@ def seperation_bulkDNA_local(dataframe,baseline):
         names["Block{0}".format(block)] = [block, len(grp[block])]
     currentDF = pd.DataFrame.from_dict(names, orient='index', columns=['grp_number', 'Length'])
     currentDF.head()
-    Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number'] 
+    Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number']
+    # print(Chromosome_block)
     x = int(Chromosome_block)
     chromosome = grp[x]
 
@@ -117,9 +119,11 @@ percentage_means_dict = {}
 
 index = 0
 for baseline in baselines:
-    percentage_means_dict[index] = [baseline] + meanpercentage(files, baseline)
-    index += 1
-
+    try:
+        percentage_means_dict[index] = [baseline] + meanpercentage(files, baseline)
+        index += 1
+    except TypeError:
+        print(f"{baseline} gave a problem")
 percentage_means_df = pd.DataFrame.from_dict(percentage_means_dict, orient='index', columns=['Baseline', 'percentage_EdU', 'percentage_Hoechst'])
 percentage_means_df.head
 
