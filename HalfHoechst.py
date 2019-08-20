@@ -5,30 +5,49 @@ from glob import glob
 import statistics
 from scipy import integrate
 
-files = glob('**/*.csv', recursive=True)
+files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/**/*.csv', recursive=True)
 files
 
 
 def seperation_bulkDNA_local(dataframe):
     df = dataframe
 
-    standart = pd.DataFrame()
-    standart['Distance'] = df['Distance']
-    # standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
-    standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
-    standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
+    if 'Scc1' in df.columns:
+        standart = pd.DataFrame()
+        standart['Distance'] = df['Distance']
+        standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
+        standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
+        standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
 
-    # defiing chromosomal region according to hoechst threshhold
-    standart['Chromosome'] = "no"
-    # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
-    standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
+        # defiing chromosomal region according to hoechst threshhold
+        standart['Chromosome'] = "no"
+        # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
+        standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
 
-    # splotting values over threshhold into condecutive dictionaries
-    s = (standart['Chromosome'] == 'yes')
-    s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
-    grp = {}
-    for i in np.unique(s)[1:]:
-        grp[i] = standart.loc[s == i, ['Distance', 'f-ara-EdU', 'Hoechst']]
+        # splotting values over threshhold into condecutive dictionaries
+        s = (standart['Chromosome'] == 'yes')
+        s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
+        grp = {}
+        for i in np.unique(s)[1:]:
+            grp[i] = standart.loc[s == i, ['Distance', 'Scc1', 'f-ara-EdU', 'Hoechst']]
+    else:
+        standart = pd.DataFrame()
+        standart['Distance'] = df['Distance']
+        # standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
+        standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
+        standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
+
+        # defiing chromosomal region according to hoechst threshhold
+        standart['Chromosome'] = "no"
+        # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
+        standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
+
+        # splotting values over threshhold into condecutive dictionaries
+        s = (standart['Chromosome'] == 'yes')
+        s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
+        grp = {}
+        for i in np.unique(s)[1:]:
+            grp[i] = standart.loc[s == i, ['Distance', 'f-ara-EdU', 'Hoechst']]
 
     # extracting the biggest block over threshhold as Chromosomal mass
     dicts = list(range(1, i+1))
