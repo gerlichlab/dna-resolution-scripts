@@ -94,21 +94,21 @@ def seperation_bulkDNA_local(dataframe):
     results = [left_EdU, right_EdU, ratio_EdU, percentage_EdU, left_Hoechst, right_Hoechst, ratio_Hoechst, percentage_Hoechst]
     return results
 
+def meanpercentage():
+    ratios_dict = {}
+    index = 0
+    for file in files:
+        try:
+            ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file))
+            index += 1
+        except KeyError:
+            print(f'{file}was skipped')
+    ratios_df = pd.DataFrame.from_dict(ratios_dict, orient='index', columns=['File', 'left_EdU', 'right_EdU', 'ratio_EdU', 'percentage_EdU', 'left_Hoechst', 'right_Hoechst', 'ratio_Hoechst', 'percentage_Hoechst'])
+    percentage_means = [ratios_df['percentage_EdU'].mean(), ratios_df['percentage_Hoechst'].mean()]
+    return 
 
-ratios_dict = {}
-index = 0
-for file in files:
-    try:
-        ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file))
-        index += 1
-    except KeyError:
-        print(f'{file}was skipped')
-ratios_df = pd.DataFrame.from_dict(ratios_dict, orient='index', columns=['File', 'left_EdU', 'right_EdU', 'ratio_EdU', 'percentage_EdU', 'left_Hoechst', 'right_Hoechst', 'ratio_Hoechst', 'percentage_Hoechst'])
-ratios_df.describe()
-ratios_df.to_csv('bulkDNA_seperation.csv')
+# plt.hist(ratios_df['ratio_Hoechst'], color='b')
+# plt.hist(ratios_df['ratio_EdU'], color='r')
 
-plt.hist(ratios_df['ratio_Hoechst'], color='b')
-plt.hist(ratios_df['ratio_EdU'], color='r')
-
-plt.hist(ratios_df['percentage_Hoechst'], color='b', alpha=0.6)
-plt.hist(ratios_df['percentage_EdU'], color='r', alpha=0.6)
+# plt.hist(ratios_df['percentage_Hoechst'], color='b', alpha=0.6)
+# plt.hist(ratios_df['percentage_EdU'], color='r', alpha=0.6)
