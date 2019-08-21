@@ -23,4 +23,5 @@ The script tries the Local_separation_along_linescan for different baselines wit
 ![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_EdU_hemi.png)
 ![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_EdU_fully.png)
 
-example profiles showing percentages for EdU and Hoechst respectively on one sister. Data is derived from mitotic hemilabeled samples.
+example profiles showing percentages for EdU and Hoechst respectively on one sister. x-achsis are different possible baselines 
+Data is derived from mitotic samples.
