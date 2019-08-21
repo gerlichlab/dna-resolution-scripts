@@ -20,7 +20,7 @@ Columns are File, Left intergal, right integral, ratio (EdU/non-EdU) and percent
 Since the baseline of -1 is not fix because of any biologcal context, I wanted to test the influence of changing this baseline.
 The script tries the Local_separation_along_linescan for different baselines with the same dataset.
 
-![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_EdU.png)
-![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_Hoechst.png)
+![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_EdU_hemi.png)
+![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_EdU_fully.png)
 
 example profiles showing percentages for EdU and Hoechst respectively on one sister. Data is derived from mitotic hemilabeled samples.
