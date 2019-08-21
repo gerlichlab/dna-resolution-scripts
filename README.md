@@ -15,3 +15,12 @@ To calculate percentages the Integral for the EdU containing side is divided by 
 
 The Output of the script is a pandas dataframe, that is saved to the choosen directory as a csv file.
 Columns are File, Left intergal, right integral, ratio (EdU/non-EdU) and percentage. Data is given for EdU and Hoechst respectively combined in one Dataframe.
+
+## Test_baselines
+Since the baseline of -1 is not fix because of any biologcal context, I wanted to test the influence of changing this baseline.
+The script tries the Local_separation_along_linescan for different baselines with the same dataset.
+
+![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_EdU.png)
+![Illustration of Programm](https://github.com/gerlichlab/dna-resolution-scripts/blob/master/testing_baselines_Hoechst.png)
+
+example profiles showing percentages for EdU and Hoechst respectively on one sister. Data is derived from mitotic hemilabeled samples.
