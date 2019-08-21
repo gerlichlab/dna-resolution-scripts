@@ -5,9 +5,13 @@ from glob import glob
 import statistics
 from scipy import integrate
 
-files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
-# files = glob('/groups/gerlich/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
+# Change Directory here
+Directory = "Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/"
 
+#getting files from choosen directory
+files_dir = Directory + "**/*.csv"
+files = glob(files_dir, recursive=True)
+# files = glob('/groups/gerlich/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
 files
 
 
@@ -62,7 +66,7 @@ def seperation_bulkDNA_local(dataframe,baseline):
     currentDF.head()
     Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number']
     # print(Chromosome_block)
-    x = int(Chromosome_block)
+    x = int(Chromosome_block) 
     chromosome = grp[x]
 
     # shifting curves above 0
@@ -114,7 +118,7 @@ def meanpercentage(files,baseline):
 
 
 baselines = list(np.arange(-1.5, -0.45, 0.05))
-print(baselines)
+# print(baselines)
 percentage_means_dict = {}
 
 index = 0
