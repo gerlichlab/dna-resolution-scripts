@@ -8,17 +8,17 @@ from scipy import integrate
 # Change Directory here
 Directory = "Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/"
 
-#getting files from choosen directory
+# getting files from choosen directory
 files_dir = Directory + "**/*.csv"
 files = glob(files_dir, recursive=True)
 # files = glob('/groups/gerlich/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/peakshift_190715_115925_Airyscan_Processed.G2_4681_Mitotic_Hemi_2019_07_15__11_22_34.czi - Image 4 #1.tif_registered.tif/*.csv', recursive=True)
 files
 
 
-def seperation_bulkDNA_local(dataframe,baseline):
+def seperation_bulkDNA_local(dataframe, baseline):
     df = dataframe
 
-    i=0
+    i = 0
     if 'Scc1' in df.columns:
         standart = pd.DataFrame()
         standart['Distance'] = df['Distance']
@@ -66,7 +66,7 @@ def seperation_bulkDNA_local(dataframe,baseline):
     currentDF.head()
     Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number']
     # print(Chromosome_block)
-    x = int(Chromosome_block) 
+    x = int(Chromosome_block)
     chromosome = grp[x]
 
     # shifting curves above 0
@@ -103,12 +103,12 @@ def seperation_bulkDNA_local(dataframe,baseline):
     return results
 
 
-def meanpercentage(files,baseline):
+def meanpercentage(files, baseline):
     ratios_dict = {}
     index = 0
     for file in files:
         try:
-            ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file),baseline)
+            ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file), baseline)
             index += 1
         except KeyError:
             print(f'{file}was skipped for {baseline}')
