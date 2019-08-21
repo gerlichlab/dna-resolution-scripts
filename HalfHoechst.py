@@ -5,13 +5,13 @@ from glob import glob
 import statistics
 from scipy import integrate
 
-# Change Directory here
-Directory = "Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/"
+# Change Directory here, end with / (Windows: change \ to /)
+Directory = "Y:/experiments/Experiments_004600/004637/After registration G2/Fully/Control siRNA/6h Lineprofiles orthogonal to Vermicelli/"
 
 
 def seperation_bulkDNA_local(dataframe):
     df = dataframe
-
+    i=0
     # Testing for Scc1 in Columns (in G2 sample) else Mitotic sample
     if 'Scc1' in df.columns:
         standart = pd.DataFrame()
@@ -59,7 +59,7 @@ def seperation_bulkDNA_local(dataframe):
     for i in dicts:
         names["Block{0}".format(i)] = [i, len(grp[i])]
     currentDF = pd.DataFrame.from_dict(names, orient='index', columns=['grp_number', 'Length'])
-    currentDF.head()
+    # Determining largest consecutive block and assuming this one as chromosome
     Chromosome_block = currentDF.loc[currentDF['Length'] == currentDF['Length'].max(), 'grp_number']
     x = int(Chromosome_block)
     chromosome = grp[x]
@@ -97,6 +97,7 @@ def seperation_bulkDNA_local(dataframe):
     results = [left_EdU, right_EdU, ratio_EdU, percentage_EdU, left_Hoechst, right_Hoechst, ratio_Hoechst, percentage_Hoechst]
     return results
 
+
 #getting files from choosen directory
 files_dir = Directory + "**/*.csv"
 files = glob(files_dir, recursive=True)
@@ -109,6 +110,9 @@ for file in files:
         index += 1
     # skipping files without the requirements in Columns
     except KeyError:
+        print(f'{file}was skipped')
+    # skipping Datasets where two Hoechst blocks have the same size
+    except TypeError:
         print(f'{file}was skipped')
 ratios_df = pd.DataFrame.from_dict(ratios_dict, orient='index', columns=['File', 'left_EdU', 'right_EdU', 'ratio_EdU', 'percentage_EdU', 'left_Hoechst', 'right_Hoechst', 'ratio_Hoechst', 'percentage_Hoechst'])
 ratios_df.describe()
