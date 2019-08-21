@@ -5,16 +5,18 @@ from glob import glob
 import statistics
 from scipy import integrate
 
-files = glob('Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/**/*.csv', recursive=True)
-files
+# Change Directory here
+Directory = "Y:/experiments/Experiments_004600/004681/After registration/mitotic/local bulk DNA seperation/"
 
 
 def seperation_bulkDNA_local(dataframe):
     df = dataframe
 
+    # Testing for Scc1 in Columns (in G2 sample) else Mitotic sample
     if 'Scc1' in df.columns:
         standart = pd.DataFrame()
         standart['Distance'] = df['Distance']
+        # z- standartdization
         standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
         standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
         standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
@@ -24,7 +26,7 @@ def seperation_bulkDNA_local(dataframe):
         # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
         standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
 
-        # splotting values over threshhold into condecutive dictionaries
+        # splitting values over threshhold into consecutive dictionaries
         s = (standart['Chromosome'] == 'yes')
         s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
         grp = {}
@@ -33,6 +35,7 @@ def seperation_bulkDNA_local(dataframe):
     else:
         standart = pd.DataFrame()
         standart['Distance'] = df['Distance']
+        # z- standartdization
         # standart['Scc1'] = (df['Scc1']-df['Scc1'].mean())/df['Scc1'].std()
         standart['f-ara-EdU'] = (df['f-ara-EdU']-df['f-ara-EdU'].mean())/df['f-ara-EdU'].std()
         standart['Hoechst'] = (df['Hoechst']-df['Hoechst'].mean())/df['Hoechst'].std()
@@ -42,7 +45,7 @@ def seperation_bulkDNA_local(dataframe):
         # standart['Chromosome_2'] = standart.loc[standart['Hoechst'] > -1] = 'yes'
         standart.loc[standart['Hoechst'] > -1, ['Chromosome']] = 'yes'
 
-        # splotting values over threshhold into condecutive dictionaries
+        # splitting values over threshhold into consecutive dictionaries
         s = (standart['Chromosome'] == 'yes')
         s = (s.gt(s.shift(fill_value=False)) + 0).cumsum() * s
         grp = {}
@@ -94,6 +97,9 @@ def seperation_bulkDNA_local(dataframe):
     results = [left_EdU, right_EdU, ratio_EdU, percentage_EdU, left_Hoechst, right_Hoechst, ratio_Hoechst, percentage_Hoechst]
     return results
 
+#getting files from choosen directory
+files_dir = Directory + "**/*.csv"
+files = glob(files_dir, recursive=True)
 
 ratios_dict = {}
 index = 0
@@ -101,11 +107,15 @@ for file in files:
     try:
         ratios_dict[f'{index}'] = [file] + seperation_bulkDNA_local(pd.read_csv(file))
         index += 1
+    # skipping files without the requirements in Columns
     except KeyError:
         print(f'{file}was skipped')
 ratios_df = pd.DataFrame.from_dict(ratios_dict, orient='index', columns=['File', 'left_EdU', 'right_EdU', 'ratio_EdU', 'percentage_EdU', 'left_Hoechst', 'right_Hoechst', 'ratio_Hoechst', 'percentage_Hoechst'])
 ratios_df.describe()
-ratios_df.to_csv('bulkDNA_seperation.csv')
+
+# saving csv file in chosen directory
+Save_dir = Directory + 'bulkDNA_separation.csv'
+ratios_df.to_csv(Save_dir)
 
 plt.hist(ratios_df['ratio_Hoechst'], color='b')
 plt.hist(ratios_df['ratio_EdU'], color='r')
